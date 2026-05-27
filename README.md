@@ -8,10 +8,10 @@
 
 - Team 14 — Hackathon QuintoAndar AI
 
-Christian Arce - Senior Engineering Manager
-Ignacio Puglisi - Operation Analyst
-Eduardo Tamburrini - Software Engineer
-Lucas Nicolas Viale - Software Engineer
+- Christian Arce - Senior Engineering Manager
+- Ignacio Puglisi - Operation Analyst
+- Eduardo Tamburrini - Software Engineer
+- Lucas Nicolas Viale - Software Engineer
 
 ## Link al repositorio
 
