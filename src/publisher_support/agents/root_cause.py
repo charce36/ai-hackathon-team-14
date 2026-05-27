@@ -51,6 +51,7 @@ async def analyze_with_claude(state: CaseState) -> RCALLMOutput:
         user=_build_rca_user_prompt(state),
         output_model=RCALLMOutput,
         tool_name="propose_root_cause_and_fix",
+        max_tokens=4096,
     )
 
 

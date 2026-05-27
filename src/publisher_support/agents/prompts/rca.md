@@ -11,9 +11,14 @@ Tu tarea:
 3. Proponer un patch_id único (kebab-case) y descripción accionable.
 4. Incluir al menos un archivo con código ejecutable real en files[].content (Python, shell o YAML según corresponda).
 
+CAMPOS OBLIGATORIOS en la tool (todos deben estar presentes):
+- root_cause, summary, confidence, eta_minutes, patch_id, description
+- files: array con mínimo 1 elemento { path, action, content }
+- reasoning: string con explicación técnica para Ops
+
 Reglas:
 - summary: texto claro en español para enviar al publisher (1-2 oraciones).
 - files[].content: código concreto, no placeholders vacíos.
-- reasoning: breve explicación técnica para consola Ops.
+- reasoning: breve explicación técnica para consola Ops (nunca omitir este campo).
 
-Respondé únicamente via la tool estructurada.
+Respondé únicamente via la tool estructurada propose_root_cause_and_fix.

@@ -26,9 +26,13 @@ def get_anthropic_client() -> anthropic.AsyncAnthropic:
 def _tool_schema(model: type[BaseModel], tool_name: str) -> dict:
     schema = model.model_json_schema()
     schema.pop("title", None)
+    # Anthropic requiere 'required' explícito en object schemas
+    props = schema.get("properties", {})
+    schema["required"] = list(props.keys())
+    schema["additionalProperties"] = False
     return {
         "name": tool_name,
-        "description": f"Structured output for {tool_name}",
+        "description": f"Structured output for {tool_name}. Debes completar TODOS los campos.",
         "input_schema": schema,
     }
 
@@ -39,20 +43,24 @@ async def invoke_structured(
     user: str,
     output_model: type[T],
     tool_name: str,
+    max_tokens: int | None = None,
 ) -> T:
     require_api_key()
     client = get_anthropic_client()
     tool = _tool_schema(output_model, tool_name)
+    tokens = max_tokens or settings.claude_max_tokens
 
+    messages: list[dict] = [{"role": "user", "content": user}]
     last_error: Exception | None = None
-    for attempt in range(2):
+
+    for attempt in range(3):
         try:
             response = await client.messages.create(
                 model=settings.claude_model,
-                max_tokens=settings.claude_max_tokens,
+                max_tokens=tokens,
                 temperature=0,
                 system=system,
-                messages=[{"role": "user", "content": user}],
+                messages=messages,
                 tools=[tool],
                 tool_choice={"type": "tool", "name": tool_name},
             )
@@ -64,16 +72,27 @@ async def invoke_structured(
             raise LLMInvocationError(
                 f"Claude no devolvió tool_use '{tool_name}' (intento {attempt + 1})"
             )
-        except (LLMConfigurationError,):
+        except LLMConfigurationError:
             raise
         except ValidationError as exc:
             last_error = LLMInvocationError(f"Salida inválida del modelo: {exc}")
+            messages.append(
+                {
+                    "role": "user",
+                    "content": (
+                        f"La respuesta anterior fue inválida: {exc}. "
+                        f"Volvé a llamar la tool '{tool_name}' con TODOS los campos requeridos, "
+                        "incluyendo files (array con al menos un objeto path/action/content) "
+                        "y reasoning (string no vacío)."
+                    ),
+                }
+            )
         except anthropic.APIError as exc:
             last_error = LLMInvocationError(f"Error Anthropic API: {exc}")
         except Exception as exc:
             last_error = LLMInvocationError(f"Error invocando Claude: {exc}")
 
-        if attempt == 0:
-            await asyncio.sleep(0.5)
+        if attempt < 2:
+            await asyncio.sleep(0.8)
 
     raise last_error or LLMInvocationError("Error desconocido invocando Claude")
