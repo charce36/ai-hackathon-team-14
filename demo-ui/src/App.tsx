@@ -8,6 +8,7 @@ import {
   subscribeCaseEvents,
 } from "./api";
 import AgentConsole from "./components/AgentConsole";
+import InboxView from "./components/InboxView";
 import PhoneFrame from "./components/PhoneFrame";
 import ScenarioChips from "./components/ScenarioChips";
 import WhatsAppChat from "./components/WhatsAppChat";
@@ -76,9 +77,35 @@ export default function App() {
     if (demo) handleScenario(demo);
   };
 
+  const [view, setView] = useState<"demo" | "inbox">("demo");
+
+  if (view === "inbox") {
+    return (
+      <div style={{ position: "relative" }}>
+        <button onClick={() => setView("demo")}
+          style={{ position: "fixed", top: 10, right: 16, zIndex: 999,
+            padding: "5px 12px", borderRadius: 8, border: "none",
+            background: "#334155", color: "#fff", fontSize: 12, fontWeight: 600,
+            cursor: "pointer", fontFamily: "inherit" }}>
+          ← Demo original
+        </button>
+        <InboxView scenarios={scenarios} />
+      </div>
+    );
+  }
+
   return (
     <div className="demo-shell">
-      <header className="demo-header">Publisher Support Agent — Demo QuintoAndar</header>
+      <header className="demo-header" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, position: "relative" }}>
+        Publisher Support Agent — Demo QuintoAndar
+        <button onClick={() => setView("inbox")}
+          style={{ position: "absolute", right: 12,
+            padding: "4px 12px", borderRadius: 8, border: "none",
+            background: "#6366f1", color: "#fff", fontSize: 12, fontWeight: 600,
+            cursor: "pointer", fontFamily: "inherit" }}>
+          Inbox →
+        </button>
+      </header>
       <div className="demo-phone-panel">
         <PhoneFrame>
           <WhatsAppChat
@@ -88,10 +115,22 @@ export default function App() {
             onSend={handleSend}
             disabled={running}
           />
-          <div className="wa-input-area" style={{ background: "#ece5dd" }}>
+          <div style={{
+            background: "#efeae2", padding: "8px 10px 10px",
+            display: "flex", flexDirection: "column", gap: 7, flexShrink: 0,
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+          }}>
             <ScenarioChips scenarios={scenarios} onSelect={handleScenario} disabled={running} />
-            <button className="record-btn" onClick={handleRecordDemo} disabled={running}>
-              Grabar demo (cuenta bloqueada)
+            <button onClick={handleRecordDemo} disabled={running} style={{
+              width: "100%", padding: "9px 0", borderRadius: 12, border: "none",
+              background: running
+                ? "rgba(7,94,84,0.45)"
+                : "linear-gradient(135deg, #25d366, #075e54)",
+              color: "#fff", fontSize: 13, fontWeight: 700, cursor: running ? "not-allowed" : "pointer",
+              letterSpacing: "0.02em", boxShadow: running ? "none" : "0 2px 8px rgba(7,94,84,0.35)",
+              transition: "all 0.2s", fontFamily: "inherit",
+            }}>
+              {running ? "Procesando…" : "▶  Grabar demo (cuenta bloqueada)"}
             </button>
           </div>
         </PhoneFrame>

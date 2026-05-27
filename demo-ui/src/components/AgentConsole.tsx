@@ -15,9 +15,15 @@ export default function AgentConsole({ events, caseId, running }: Props) {
       </div>
       {events.map((event) => {
         const line = formatConsoleLine(event);
+        const reasoning = event.metadata?.reasoning as string | undefined;
         return (
-          <div key={event.id} className={`console-line ${line.className}`}>
-            {line.text}
+          <div key={event.id}>
+            <div className={`console-line ${line.className}`}>{line.text}</div>
+            {reasoning && (
+              <div className="console-line" style={{ color: "#8b949e", paddingLeft: "1rem" }}>
+                ↳ {reasoning}
+              </div>
+            )}
           </div>
         );
       })}

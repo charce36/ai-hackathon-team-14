@@ -3,6 +3,7 @@
   "label": "Datos viejos en panel",
   "query": "Veo datos viejos en mi panel de publicaciones, no se actualizan",
   "publisher_id": "pub-demo-003",
+  "stacktrace": "2026-05-27T09:55:00Z WARN  [mysql-monitor] replication_lag_ms=45000 threshold=5000\n2026-05-27T09:55:00Z ERROR [publisher-panel] StaleDataException: read replica lag exceeds SLA\n\tat com.navent.realestate.portal.PanelService.getPostings(PanelService.java:234)\n\tat com.navent.realestate.portal.PanelController.list(PanelController.java:56)",
   "monitors": {
     "gcp": {
       "pre_fix": { "healthy": true, "anomalies": [], "details": {} },

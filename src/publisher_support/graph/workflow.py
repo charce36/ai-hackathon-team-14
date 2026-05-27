@@ -2,10 +2,10 @@ from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
+from publisher_support.agents.classifier import classifier_node
 from publisher_support.agents.monitors import monitors_node
 from publisher_support.agents.root_cause import root_cause_node
 from publisher_support.agents.supervisor import (
-    classifier_node,
     notify_identified_node,
     notify_resolved_node,
     supervisor_node,
@@ -65,6 +65,20 @@ async def _notify_resolved(state: WorkflowContext) -> WorkflowContext:
     return await _wrap(notify_resolved_node, state)
 
 
+def _route_if_escalated(state: WorkflowContext, next_node: str) -> str:
+    if state["case"].status == CaseStatus.ESCALATED:
+        return "end"
+    return next_node
+
+
+def _route_after_classifier(state: WorkflowContext) -> str:
+    return _route_if_escalated(state, "monitors")
+
+
+def _route_after_root_cause(state: WorkflowContext) -> str:
+    return _route_if_escalated(state, "notify_identified")
+
+
 def _route_after_human(state: WorkflowContext) -> str:
     case = state["case"]
     if case.status == CaseStatus.ESCALATED:
@@ -93,9 +107,17 @@ def build_workflow() -> StateGraph:
 
     graph.set_entry_point("supervisor")
     graph.add_edge("supervisor", "classifier")
-    graph.add_edge("classifier", "monitors")
+    graph.add_conditional_edges(
+        "classifier",
+        _route_after_classifier,
+        {"monitors": "monitors", "end": END},
+    )
     graph.add_edge("monitors", "root_cause")
-    graph.add_edge("root_cause", "notify_identified")
+    graph.add_conditional_edges(
+        "root_cause",
+        _route_after_root_cause,
+        {"notify_identified": "notify_identified", "end": END},
+    )
     graph.add_edge("notify_identified", "human_gate")
     graph.add_conditional_edges("human_gate", _route_after_human, {"mock_cicd": "mock_cicd", "end": END})
     graph.add_edge("mock_cicd", "verify")

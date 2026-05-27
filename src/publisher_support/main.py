@@ -48,7 +48,12 @@ async def _execute_case(case: CaseState, video_demo: bool | None) -> None:
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "video_demo": settings.video_demo, "dry_run": settings.dry_run}
+    return {
+        "status": "ok",
+        "video_demo": settings.video_demo,
+        "claude_model": settings.claude_model,
+        "llm_configured": bool(settings.anthropic_api_key),
+    }
 
 
 @app.get("/scenarios")

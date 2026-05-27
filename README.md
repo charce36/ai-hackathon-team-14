@@ -67,11 +67,12 @@ cd ai-hackathon-team-14
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env
+# Editar .env y setear ANTHROPIC_API_KEY=sk-ant-...
 
 cd demo-ui && npm install && npm run build && cd ..
 
-# Cómo arrancar
-VIDEO_DEMO=true DRY_RUN=true uvicorn publisher_support.main:app --host 0.0.0.0 --port 8000
+# Cómo arrancar (ANTHROPIC_API_KEY requerida en .env)
+VIDEO_DEMO=true uvicorn publisher_support.main:app --host 0.0.0.0 --port 8000
 # Abrir http://localhost:8000/demo
 
 # Tests
@@ -85,17 +86,19 @@ chmod +x scripts/demo_case.sh && ./scripts/demo_case.sh
 
 | Variable | Default | Descripción |
 |----------|---------|-------------|
+| `ANTHROPIC_API_KEY` | — | **Requerida** — API key de Claude Platform |
+| `CLAUDE_MODEL` | `claude-sonnet-4-6` | Modelo Claude para Classifier y RCA |
+| `CLAUDE_MAX_TOKENS` | `2048` | Máximo tokens por llamada |
+| `RCA_CONFIDENCE_THRESHOLD` | `0.6` | Bajo este umbral el caso se escala a humano |
 | `VIDEO_DEMO` | `true` | Auto-aprueba human gate + delays para video |
 | `DEMO_STEP_DELAY_MS` | `800` | Pausa entre pasos en consola |
-| `DRY_RUN` | `true` | Lógica determinista sin API key LLM |
 | `AUTO_APPROVE_DELAY_SEC` | `2` | Delay antes de auto-approve |
-| `OPENAI_API_KEY` | — | Opcional para LLM en runtime |
 
 ## Stack
 
 - **Frontend:** React 18 + Vite + TypeScript (WhatsApp clone + consola SSE)
 - **Backend:** FastAPI + uvicorn + sse-starlette
-- **AI / modelos:** LangGraph + LangChain Core; DRY_RUN rule-based (OpenAI/Anthropic opcional)
+- **AI / modelos:** LangGraph + **Claude (Anthropic API)** en Classifier y RCA con structured outputs; temperature=0
 - **Infra / deploy:** local; mocks listos para cablear GCP/MySQL/SAP/Rundeck reales
 
 ## Arquitectura

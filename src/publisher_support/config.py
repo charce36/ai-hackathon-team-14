@@ -11,10 +11,11 @@ class Settings(BaseSettings):
 
     video_demo: bool = True
     demo_step_delay_ms: int = 800
-    dry_run: bool = True
     auto_approve_delay_sec: float = 2.0
-    openai_api_key: str = ""
     anthropic_api_key: str = ""
+    claude_model: str = "claude-sonnet-4-6"
+    claude_max_tokens: int = 2048
+    rca_confidence_threshold: float = 0.6
 
 
 settings = Settings()
