@@ -38,9 +38,19 @@
     "summary": "La cuenta del publisher está bloqueada por deuda pendiente en SAP",
     "eta_minutes": 15
   },
+  "resolution": {
+    "summary": "Desbloqueamos tu cuenta y ya podés publicar tus avisos sin errores."
+  },
   "patch": {
     "patch_id": "unblock-account",
     "description": "Desbloquear cuenta tras regularización de deuda",
     "files": [{ "path": "scripts/unblock_publisher.py", "action": "run" }]
+  },
+  "checks": {
+    "post_fix": [
+      { "id": "account-status", "name": "Estado cuenta activa", "pass": true },
+      { "id": "publish-smoke", "name": "Smoke test publicación", "pass": true },
+      { "id": "sap-debt-cleared", "name": "Deuda SAP regularizada", "pass": true }
+    ]
   }
 }

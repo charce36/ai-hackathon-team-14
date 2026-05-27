@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
+from publisher_support.checks.base import CheckResult
 from publisher_support.models.events import AuditEvent, ClientMessage
 
 
@@ -67,6 +68,7 @@ class VerificationResult(BaseModel):
     resolved: bool
     tests_pass: bool
     monitors_healthy: bool
+    check_results: list[CheckResult] = Field(default_factory=list)
     evidence: str
 
 

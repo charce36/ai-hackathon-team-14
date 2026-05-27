@@ -38,9 +38,18 @@
     "summary": "El job de sincronización SAP falló hace 36 horas",
     "eta_minutes": 20
   },
+  "resolution": {
+    "summary": "Re-sincronizamos SAP y tu facturación ya refleja los pagos actualizados."
+  },
   "patch": {
     "patch_id": "trigger-sap-sync",
     "description": "Re-ejecutar job de sincronización SAP",
     "files": [{ "path": "jobs/sap_sync.rundeck", "action": "trigger" }]
+  },
+  "checks": {
+    "post_fix": [
+      { "id": "sap-sync-recent", "name": "Sync SAP reciente (< 24h)", "pass": true },
+      { "id": "billing-consistent", "name": "Facturación consistente con pagos", "pass": true }
+    ]
   }
 }
