@@ -1,0 +1,133 @@
+# Publisher Support Agent
+
+> Agente multi-agente de soporte para publishers Navent/QuintoAndar: recibe consultas vía WhatsApp simulado, diagnostica la plataforma y resuelve incidentes con aprobación humana.
+
+---
+
+## Equipo
+
+- Team 14 — Hackathon QuintoAndar AI
+- _(Completar nombres y roles del equipo)_
+
+## Link al repositorio
+
+🔗 [https://github.com/charce36/ai-hackathon-team-14](https://github.com/charce36/ai-hackathon-team-14)
+
+## El problema
+
+Los publishers de Zonaprop y portales Navent reportan fallas operativas (publicación bloqueada, facturación SAP desactualizada, lag MySQL, APIs caídas, jobs batch fallidos) por canales dispersos (WhatsApp, email, tickets).
+
+- **A quién le pasa:** publishers e inmobiliarias que operan en la plataforma.
+- **Cómo se resuelve hoy:** equipos de Ops revisan manualmente GCP, MySQL, SAP, Rundeck y estado de cuenta — proceso lento y sin trazabilidad unificada para el cliente.
+- **Por qué no alcanza:** alta latencia, falta de comunicación proactiva al publisher y correlación manual entre sistemas.
+
+## La solución
+
+Construimos un **orquestador multi-agente** (LangGraph + FastAPI) que:
+
+1. Recibe la consulta del publisher (UI tipo WhatsApp).
+2. Clasifica el incidente y ejecuta **5 agentes de monitoreo** en paralelo (GCP, MySQL, SAP, cuenta, Rundeck).
+3. Identifica causa raíz y propone un fix.
+4. Pasa por **aprobación humana** y simula CI/CD.
+5. Verifica la solución y notifica al publisher en **3 mensajes**: verificando → identificado + ETA → resuelto.
+
+La demo usa **pantalla dividida**: celular WhatsApp a la izquierda y consola de agentes en tiempo real a la derecha (SSE).
+
+**Diferenciador:** no es un chatbot genérico — es un pipeline operativo con gates deterministas, mocks extensibles a sistemas reales y trazabilidad completa por agente.
+
+## Aplicabilidad en QuintoAndar / Zonaprop / Tokko
+
+- **Producto:** soporte a publishers en Zonaprop (ZP) y portales RELA — canal WhatsApp Business + consola Ops interna.
+- **Problema operativo:** reducir MTTR de incidentes recurrentes (cuenta bloqueada, sync SAP, lag DB).
+- **Equipo natural:** Ops / Platform Engineering + Customer Success publishers.
+
+## ¿Por qué IA acá no es decorativa?
+
+- **Clasificación NL:** el publisher describe el problema en lenguaje natural; el agente extrae categoría, severidad y servicios afectados.
+- **Correlación RCA:** sintetiza snapshots de 5 dominios en una hipótesis accionable.
+- **Mensajes contextuales:** redacta updates al publisher según estado del caso.
+
+Sin IA quedaría un **router de tickets estático** por keywords — funcional pero sin adaptación ni síntesis. La IA aporta interpretación de consultas ambiguas y explicaciones legibles al cliente.
+
+## Demo
+
+🎬 El video demo se sube a la carpeta de Drive del hackathon.
+
+- UI interactiva: `http://localhost:8000/demo` (split-screen WhatsApp + consola)
+- Botón **"Grabar demo"** para escenario preconfigurado
+- Ver guion en [DEMO_VIDEO.md](./DEMO_VIDEO.md)
+
+## Cómo correrlo
+
+```bash
+# Requisitos previos: Python 3.11+, Node 18+
+
+# Instalación
+cd ai-hackathon-team-14
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env
+
+cd demo-ui && npm install && npm run build && cd ..
+
+# Cómo arrancar
+VIDEO_DEMO=true DRY_RUN=true uvicorn publisher_support.main:app --host 0.0.0.0 --port 8000
+# Abrir http://localhost:8000/demo
+
+# Tests
+pytest
+
+# Script CLI de demo
+chmod +x scripts/demo_case.sh && ./scripts/demo_case.sh
+```
+
+### Variables de entorno necesarias
+
+| Variable | Default | Descripción |
+|----------|---------|-------------|
+| `VIDEO_DEMO` | `true` | Auto-aprueba human gate + delays para video |
+| `DEMO_STEP_DELAY_MS` | `800` | Pausa entre pasos en consola |
+| `DRY_RUN` | `true` | Lógica determinista sin API key LLM |
+| `AUTO_APPROVE_DELAY_SEC` | `2` | Delay antes de auto-approve |
+| `OPENAI_API_KEY` | — | Opcional para LLM en runtime |
+
+## Stack
+
+- **Frontend:** React 18 + Vite + TypeScript (WhatsApp clone + consola SSE)
+- **Backend:** FastAPI + uvicorn + sse-starlette
+- **AI / modelos:** LangGraph + LangChain Core; DRY_RUN rule-based (OpenAI/Anthropic opcional)
+- **Infra / deploy:** local; mocks listos para cablear GCP/MySQL/SAP/Rundeck reales
+
+## Arquitectura
+
+```mermaid
+flowchart LR
+  WA[WhatsApp_UI] --> API[FastAPI]
+  API --> Graph[LangGraph]
+  Graph --> Mon[Monitores_x5]
+  Mon --> RCA[RCA_Fix]
+  RCA --> Human[Human_Gate]
+  Human --> CICD[Mock_CI/CD]
+  CICD --> Verify[Verify]
+  Verify --> Notify[Notify]
+  Graph --> SSE[SSE_Events]
+  SSE --> Console[Agent_Console]
+  SSE --> WA
+```
+
+## Limitaciones conocidas
+
+- Adaptadores **mock** — no conecta a GCP/MySQL/SAP/Rundeck reales.
+- WhatsApp **simulado** en UI — no usa WhatsApp Business API.
+- Patches **predefinidos** por escenario (1:1 con fixtures JSON).
+- Prototipo de hackathon — no apto para producción sin hardening.
+
+## Próximos pasos
+
+1. Cablear adapters reales (read-only) a monitoreo prod.
+2. Integrar WhatsApp Business API como canal de ingesta/notificación.
+3. Evals automáticos sobre outputs del clasificador y RCA.
+
+## AI Usage
+
+Ver [AI_USAGE.md](./AI_USAGE.md) para el detalle de cómo usaron IA en el proceso.

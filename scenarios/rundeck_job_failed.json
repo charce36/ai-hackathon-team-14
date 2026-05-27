@@ -1,0 +1,45 @@
+{
+  "id": "rundeck_job_failed",
+  "label": "Proceso batch no corrió",
+  "query": "El proceso batch de actualización no corrió anoche",
+  "publisher_id": "pub-demo-005",
+  "monitors": {
+    "gcp": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "mysql": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "sap": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "account": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "rundeck": {
+      "pre_fix": {
+        "healthy": false,
+        "anomalies": ["last_job_failed"],
+        "details": { "job": "publisher-batch-sync", "status": "FAILED", "exit_code": 1 }
+      },
+      "post_fix": {
+        "healthy": true,
+        "anomalies": [],
+        "details": { "job": "publisher-batch-sync", "status": "SUCCESS" }
+      }
+    }
+  },
+  "root_cause": {
+    "summary": "Job Rundeck publisher-batch-sync falló con exit code 1",
+    "eta_minutes": 8
+  },
+  "patch": {
+    "patch_id": "rerun-rundeck-job",
+    "description": "Re-ejecutar job batch con parámetros corregidos",
+    "files": [{ "path": "rundeck/publisher-batch-sync.job", "action": "rerun" }]
+  }
+}

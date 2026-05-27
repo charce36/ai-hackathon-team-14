@@ -1,0 +1,45 @@
+{
+  "id": "gcp_service_down",
+  "label": "Error 503 en API",
+  "query": "Recibo error 503 al usar la API de publicaciones",
+  "publisher_id": "pub-demo-004",
+  "monitors": {
+    "gcp": {
+      "pre_fix": {
+        "healthy": false,
+        "anomalies": ["cloud_run_unhealthy"],
+        "details": { "service": "postings-api", "status": "UNHEALTHY", "http_code": 503 }
+      },
+      "post_fix": {
+        "healthy": true,
+        "anomalies": [],
+        "details": { "service": "postings-api", "status": "OK", "http_code": 200 }
+      }
+    },
+    "mysql": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "sap": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "account": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "rundeck": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    }
+  },
+  "root_cause": {
+    "summary": "Cloud Run postings-api en estado UNHEALTHY tras deploy fallido",
+    "eta_minutes": 12
+  },
+  "patch": {
+    "patch_id": "rollback-gcp-service",
+    "description": "Rollback del servicio Cloud Run a revisión estable",
+    "files": [{ "path": "deploy/gcp_rollback.yaml", "action": "apply" }]
+  }
+}

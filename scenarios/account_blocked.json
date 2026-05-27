@@ -1,0 +1,45 @@
+{
+  "id": "account_blocked",
+  "label": "Cuenta bloqueada",
+  "query": "No puedo publicar mis avisos, me aparece error al intentar publicar",
+  "publisher_id": "pub-demo-001",
+  "monitors": {
+    "gcp": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": { "cloud_run_status": "OK" } },
+      "post_fix": { "healthy": true, "anomalies": [], "details": { "cloud_run_status": "OK" } }
+    },
+    "mysql": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": { "replication_lag_ms": 120 } },
+      "post_fix": { "healthy": true, "anomalies": [], "details": { "replication_lag_ms": 120 } }
+    },
+    "sap": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": { "last_sync_hours": 2 } },
+      "post_fix": { "healthy": true, "anomalies": [], "details": { "last_sync_hours": 2 } }
+    },
+    "account": {
+      "pre_fix": {
+        "healthy": false,
+        "anomalies": ["account_status=blocked"],
+        "details": { "status": "blocked", "reason": "deuda_pendiente" }
+      },
+      "post_fix": {
+        "healthy": true,
+        "anomalies": [],
+        "details": { "status": "active", "reason": null }
+      }
+    },
+    "rundeck": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": { "last_job": "SUCCESS" } },
+      "post_fix": { "healthy": true, "anomalies": [], "details": { "last_job": "SUCCESS" } }
+    }
+  },
+  "root_cause": {
+    "summary": "La cuenta del publisher está bloqueada por deuda pendiente en SAP",
+    "eta_minutes": 15
+  },
+  "patch": {
+    "patch_id": "unblock-account",
+    "description": "Desbloquear cuenta tras regularización de deuda",
+    "files": [{ "path": "scripts/unblock_publisher.py", "action": "run" }]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "mysql_replication_lag",
+  "label": "Datos viejos en panel",
+  "query": "Veo datos viejos en mi panel de publicaciones, no se actualizan",
+  "publisher_id": "pub-demo-003",
+  "monitors": {
+    "gcp": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "mysql": {
+      "pre_fix": {
+        "healthy": false,
+        "anomalies": ["replication_lag_high"],
+        "details": { "replication_lag_ms": 45000, "threshold_ms": 5000 }
+      },
+      "post_fix": {
+        "healthy": true,
+        "anomalies": [],
+        "details": { "replication_lag_ms": 800 }
+      }
+    },
+    "sap": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "account": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    },
+    "rundeck": {
+      "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
+      "post_fix": { "healthy": true, "anomalies": [], "details": {} }
+    }
+  },
+  "root_cause": {
+    "summary": "Lag de replicación MySQL RW→RO supera el umbral operativo",
+    "eta_minutes": 10
+  },
+  "patch": {
+    "patch_id": "fix-mysql-replication",
+    "description": "Forzar catch-up de replicación MySQL",
+    "files": [{ "path": "ops/mysql_replication_fix.sh", "action": "run" }]
+  }
+}
