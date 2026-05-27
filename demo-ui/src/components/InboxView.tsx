@@ -23,7 +23,7 @@ interface Publisher {
   phone: string;
 }
 
-interface Conversation {
+export interface Conversation {
   id: string;
   publisherId: string;
   scenarioId: string;
@@ -36,6 +36,12 @@ interface Conversation {
 }
 
 const PUBLISHERS: Record<string, Publisher> = {
+  "pub-demo-001": {
+    id: "pub-demo-001", name: "Publisher Demo", email: "demo@quintoandar.com.br",
+    company: "QuintoAndar Demo", plan: "Premium", accountStatus: "active",
+    listings: 25, activeListings: 20, joinedDate: "2024-01-01",
+    avatarColor: "#8b5cf6", phone: "+54 11 0000-0000",
+  },
   "pub-001": {
     id: "pub-001", name: "Inmobiliaria Del Plata", email: "ops@delplata.com.ar",
     company: "Del Plata S.R.L.", plan: "Premium", accountStatus: "blocked",
@@ -145,6 +151,11 @@ function ChatPanel({ conv, scenarios, onNewCase }: {
   const scenario = scenarios.find(s => s.id === conv.scenarioId);
   const [messages, setMessages] = useState<ClientMessage[]>(conv.messages);
   const [events, setEvents] = useState<AuditEvent[]>(conv.events);
+
+  useEffect(() => {
+    setMessages(conv.messages);
+    setEvents(conv.events);
+  }, [conv.id, conv.messages, conv.events]);
   const [running, setRunning] = useState(false);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -375,13 +386,14 @@ function PublisherSidebar({ publisherId }: { publisherId: string }) {
 
 // ─── Main InboxView ───────────────────────────────────────────────────────────
 
-export default function InboxView({ scenarios }: { scenarios: Scenario[] }) {
-  const [conversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
+export default function InboxView({ scenarios, liveConversations = [] }: { scenarios: Scenario[]; liveConversations?: Conversation[] }) {
   const [selectedId, setSelectedId] = useState<string>(MOCK_CONVERSATIONS[0].id);
   const [filter, setFilter] = useState<"all" | "open" | "in_progress" | "resolved">("all");
 
+  const conversations = [...liveConversations, ...MOCK_CONVERSATIONS];
+
   const filtered = conversations.filter(c => filter === "all" || c.status === filter);
-  const selected = conversations.find(c => c.id === selectedId)!;
+  const selected = conversations.find(c => c.id === selectedId) ?? conversations[0];
 
   const counts = {
     all: conversations.length,

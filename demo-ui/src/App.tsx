@@ -8,9 +8,8 @@ import {
   subscribeCaseEvents,
 } from "./api";
 import AgentConsole from "./components/AgentConsole";
-import InboxView from "./components/InboxView";
+import InboxView, { Conversation } from "./components/InboxView";
 import PhoneFrame from "./components/PhoneFrame";
-import ScenarioChips from "./components/ScenarioChips";
 import WhatsAppChat from "./components/WhatsAppChat";
 
 function userMessage(text: string): ClientMessage {
@@ -29,6 +28,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [caseId, setCaseId] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const [liveConversations, setLiveConversations] = useState<Conversation[]>([]);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -44,15 +44,44 @@ export default function App() {
     unsubscribeRef.current?.();
     setRunning(true);
     setConsoleEvents([]);
-    setMessages([userMessage(query)]);
+    const firstMsg = userMessage(query);
+    setMessages([firstMsg]);
 
     try {
       const id = await createCase(query, publisherId, scenarioId);
       setCaseId(id);
+
+      const now = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
+      const newConv: Conversation = {
+        id,
+        publisherId,
+        scenarioId: scenarioId ?? "",
+        lastMessage: query,
+        timestamp: now,
+        status: "in_progress",
+        unread: true,
+        messages: [firstMsg],
+        events: [],
+      };
+      setLiveConversations(prev => [newConv, ...prev]);
+
       unsubscribeRef.current = subscribeCaseEvents(
         id,
-        (msg) => setMessages((prev) => [...prev, msg]),
-        (event) => setConsoleEvents((prev) => [...prev, event]),
+        (msg) => {
+          setMessages((prev) => [...prev, msg]);
+          setLiveConversations(prev => prev.map(c =>
+            c.id === id
+              ? { ...c, messages: [...c.messages, msg], lastMessage: msg.text,
+                  status: msg.type === "resolved" ? "resolved" : "in_progress" }
+              : c
+          ));
+        },
+        (event) => {
+          setConsoleEvents((prev) => [...prev, event]);
+          setLiveConversations(prev => prev.map(c =>
+            c.id === id ? { ...c, events: [...c.events, event] } : c
+          ));
+        },
       );
     } catch (err) {
       console.error(err);
@@ -72,12 +101,7 @@ export default function App() {
     startCase(scenario.query, scenario.publisher_id, scenario.id);
   };
 
-  const handleRecordDemo = () => {
-    const demo = scenarios.find((s) => s.id === "account_blocked") ?? scenarios[0];
-    if (demo) handleScenario(demo);
-  };
-
-  const [view, setView] = useState<"demo" | "inbox">("demo");
+const [view, setView] = useState<"demo" | "inbox">("demo");
 
   if (view === "inbox") {
     return (
@@ -89,7 +113,7 @@ export default function App() {
             cursor: "pointer", fontFamily: "inherit" }}>
           ← Demo original
         </button>
-        <InboxView scenarios={scenarios} />
+        <InboxView scenarios={scenarios} liveConversations={liveConversations} />
       </div>
     );
   }
@@ -115,24 +139,6 @@ export default function App() {
             onSend={handleSend}
             disabled={running}
           />
-          <div style={{
-            background: "#efeae2", padding: "8px 10px 10px",
-            display: "flex", flexDirection: "column", gap: 7, flexShrink: 0,
-            borderTop: "1px solid rgba(0,0,0,0.06)",
-          }}>
-            <ScenarioChips scenarios={scenarios} onSelect={handleScenario} disabled={running} />
-            <button onClick={handleRecordDemo} disabled={running} style={{
-              width: "100%", padding: "9px 0", borderRadius: 12, border: "none",
-              background: running
-                ? "rgba(7,94,84,0.45)"
-                : "linear-gradient(135deg, #25d366, #075e54)",
-              color: "#fff", fontSize: 13, fontWeight: 700, cursor: running ? "not-allowed" : "pointer",
-              letterSpacing: "0.02em", boxShadow: running ? "none" : "0 2px 8px rgba(7,94,84,0.35)",
-              transition: "all 0.2s", fontFamily: "inherit",
-            }}>
-              {running ? "Procesando…" : "▶  Grabar demo (cuenta bloqueada)"}
-            </button>
-          </div>
         </PhoneFrame>
       </div>
       <AgentConsole events={consoleEvents} caseId={caseId} running={running} />

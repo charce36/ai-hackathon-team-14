@@ -7,7 +7,7 @@ SCENARIOS_DIR = ROOT_DIR / "scenarios"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env", extra="ignore", env_ignore_empty=True)
 
     video_demo: bool = True
     demo_step_delay_ms: int = 800
