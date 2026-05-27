@@ -36,7 +36,6 @@ async def classifier_node(state: CaseState) -> CaseState:
     state.status = CaseStatus.CLASSIFYING
     scenario_id = detect_scenario(state.raw_query, state.scenario_id)
     state.scenario_id = scenario_id
-    scenario = load_scenario(scenario_id)
     category, severity = CATEGORY_MAP.get(scenario_id, ("general", "medium"))
     affected = SERVICE_MAP.get(scenario_id, ["account"])
 
@@ -83,12 +82,23 @@ async def notify_identified_node(state: CaseState) -> CaseState:
 
 
 async def notify_resolved_node(state: CaseState) -> CaseState:
-    summary = state.root_cause.summary if state.root_cause else "tu consulta"
+    scenario_id = (
+        state.classified.scenario_id
+        if state.classified
+        else state.scenario_id or "account_blocked"
+    )
+    scenario = load_scenario(scenario_id)
+    resolution = scenario.get("resolution", {}).get("summary")
+    if not resolution and state.root_cause:
+        resolution = state.root_cause.summary
+    if not resolution:
+        resolution = "tu consulta"
+
     await emit_client_message(
         state,
         ClientMessage(
             type=ClientMessageType.RESOLVED,
-            text=f"Tu consulta quedó resuelta: {summary}. Ya podés operar con normalidad.",
+            text=f"Tu consulta quedó resuelta: {resolution}. Ya podés operar con normalidad.",
         ),
     )
     state.status = CaseStatus.RESOLVED

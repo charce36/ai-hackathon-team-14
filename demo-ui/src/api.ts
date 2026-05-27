@@ -71,5 +71,9 @@ export function subscribeCaseEvents(
     onAudit(JSON.parse(e.data) as AuditEvent);
   });
 
+  source.onerror = () => {
+    source.close();
+  };
+
   return () => source.close();
 }

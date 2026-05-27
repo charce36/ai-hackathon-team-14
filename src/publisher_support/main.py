@@ -5,7 +5,6 @@ from pathlib import Path
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from publisher_support.adapters.scenarios import list_scenarios
@@ -139,8 +138,13 @@ async def demo_page():
     }
 
 
-if DEMO_UI_DIST.exists():
-    app.mount("/demo/assets", StaticFiles(directory=DEMO_UI_DIST / "assets"), name="demo-assets")
+@app.get("/demo/assets/{asset_path:path}")
+async def demo_assets(asset_path: str):
+    asset = (DEMO_UI_DIST / "assets" / asset_path).resolve()
+    assets_root = (DEMO_UI_DIST / "assets").resolve()
+    if not str(asset).startswith(str(assets_root)) or not asset.is_file():
+        raise HTTPException(status_code=404, detail="Asset not found")
+    return FileResponse(asset)
 
 
 def main():

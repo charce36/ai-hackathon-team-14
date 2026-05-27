@@ -37,9 +37,18 @@
     "summary": "Cloud Run postings-api en estado UNHEALTHY tras deploy fallido",
     "eta_minutes": 12
   },
+  "resolution": {
+    "summary": "Restauramos la API de publicaciones y ya responde correctamente."
+  },
   "patch": {
     "patch_id": "rollback-gcp-service",
     "description": "Rollback del servicio Cloud Run a revisión estable",
     "files": [{ "path": "deploy/gcp_rollback.yaml", "action": "apply" }]
+  },
+  "checks": {
+    "post_fix": [
+      { "id": "health-endpoint", "name": "Health endpoint responde 200", "pass": true },
+      { "id": "cloud-run-ready", "name": "Cloud Run en estado ready", "pass": true }
+    ]
   }
 }

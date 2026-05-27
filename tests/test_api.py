@@ -61,6 +61,11 @@ async def test_happy_path_resolves(client):
 
     assert case["status"] == "resolved"
     assert case["verification"]["resolved"] is True
+    assert len(case["verification"]["check_results"]) >= 1
+
+    agents = {e["agent"] for e in case["timeline"]}
+    assert "Checks" in agents
+    assert "Verify" in agents
 
     msg_types = [m["type"] for m in case["client_messages"]]
     assert "user" in msg_types

@@ -37,9 +37,18 @@
     "summary": "Lag de replicación MySQL RW→RO supera el umbral operativo",
     "eta_minutes": 10
   },
+  "resolution": {
+    "summary": "Normalizamos la replicación MySQL y tu panel ya muestra datos al día."
+  },
   "patch": {
     "patch_id": "fix-mysql-replication",
     "description": "Forzar catch-up de replicación MySQL",
     "files": [{ "path": "ops/mysql_replication_fix.sh", "action": "run" }]
+  },
+  "checks": {
+    "post_fix": [
+      { "id": "replication-lag", "name": "Lag replicación bajo umbral", "pass": true },
+      { "id": "panel-read", "name": "Lectura panel publicaciones OK", "pass": true }
+    ]
   }
 }

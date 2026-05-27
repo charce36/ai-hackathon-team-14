@@ -37,9 +37,18 @@
     "summary": "Job Rundeck publisher-batch-sync falló con exit code 1",
     "eta_minutes": 8
   },
+  "resolution": {
+    "summary": "Re-ejecutamos el job batch y el proceso de actualización completó exitosamente."
+  },
   "patch": {
     "patch_id": "rerun-rundeck-job",
     "description": "Re-ejecutar job batch con parámetros corregidos",
     "files": [{ "path": "rundeck/publisher-batch-sync.job", "action": "rerun" }]
+  },
+  "checks": {
+    "post_fix": [
+      { "id": "last-job-success", "name": "Último job batch en SUCCESS", "pass": true },
+      { "id": "batch-complete", "name": "Proceso batch completado", "pass": true }
+    ]
   }
 }
