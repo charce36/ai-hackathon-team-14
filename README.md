@@ -7,7 +7,11 @@
 ## Equipo
 
 - Team 14 — Hackathon QuintoAndar AI
-- _(Completar nombres y roles del equipo)_
+
+Christian Arce - Senior Engineering Manager
+Ignacio Puglisi - Operation Analyst
+Eduardo Tamburrini - Software Engineer
+Lucas Nicolas Viale - Software Engineer
 
 ## Link al repositorio
 
@@ -15,10 +19,10 @@
 
 ## El problema
 
-Los publishers de Zonaprop y portales Navent reportan fallas operativas (publicación bloqueada, facturación SAP desactualizada, lag MySQL, APIs caídas, jobs batch fallidos) por canales dispersos (WhatsApp, email, tickets).
+Los publishers de Zonaprop y portales Navent reportan fallas operativas.
 
 - **A quién le pasa:** publishers e inmobiliarias que operan en la plataforma.
-- **Cómo se resuelve hoy:** equipos de Ops revisan manualmente GCP, MySQL, SAP, Rundeck y estado de cuenta — proceso lento y sin trazabilidad unificada para el cliente.
+- **Cómo se resuelve hoy:** equipos de Ops revisan manualmente — proceso lento y sin trazabilidad unificada para el cliente.
 - **Por qué no alcanza:** alta latencia, falta de comunicación proactiva al publisher y correlación manual entre sistemas.
 
 ## La solución
@@ -38,7 +42,7 @@ La demo usa **pantalla dividida**: celular WhatsApp a la izquierda y consola de 
 ## Aplicabilidad en QuintoAndar / Zonaprop / Tokko
 
 - **Producto:** soporte a publishers en Zonaprop (ZP) y portales RELA — canal WhatsApp Business + consola Ops interna.
-- **Problema operativo:** reducir MTTR de incidentes recurrentes (cuenta bloqueada, sync SAP, lag DB).
+- **Problema operativo:** reducir MTTR de incidentes recurrentes.
 - **Equipo natural:** Ops / Platform Engineering + Customer Success publishers.
 
 ## ¿Por qué IA acá no es decorativa?
@@ -48,14 +52,6 @@ La demo usa **pantalla dividida**: celular WhatsApp a la izquierda y consola de 
 - **Mensajes contextuales:** redacta updates al publisher según estado del caso.
 
 Sin IA quedaría un **router de tickets estático** por keywords — funcional pero sin adaptación ni síntesis. La IA aporta interpretación de consultas ambiguas y explicaciones legibles al cliente.
-
-## Demo
-
-🎬 El video demo se sube a la carpeta de Drive del hackathon.
-
-- UI interactiva: `http://localhost:8000/demo` (split-screen WhatsApp + consola)
-- Botón **"Grabar demo"** para escenario preconfigurado
-- Ver guion en [DEMO_VIDEO.md](./DEMO_VIDEO.md)
 
 ## Cómo correrlo
 
@@ -123,7 +119,6 @@ flowchart LR
 - Adaptadores **mock** — no conecta a GCP/MySQL/SAP/Rundeck reales.
 - WhatsApp **simulado** en UI — no usa WhatsApp Business API.
 - Patches **predefinidos** por escenario (1:1 con fixtures JSON).
-- Prototipo de hackathon — no apto para producción sin hardening.
 
 ## Próximos pasos
 
