@@ -3,6 +3,7 @@
   "label": "Cuenta bloqueada",
   "query": "No puedo publicar mis avisos, me aparece error al intentar publicar",
   "publisher_id": "pub-demo-001",
+  "stacktrace": "2026-05-27T10:14:22Z ERROR [postings-api] PublisherService.publish() blocked\ncom.navent.realestate.PublisherBlockedException: account_status=blocked reason=deuda_pendiente\n\tat com.navent.realestate.core.services.PublisherService.validateAccount(PublisherService.java:142)\n\tat com.navent.realestate.core.services.PostingService.create(PostingService.java:89)\n2026-05-27T10:14:22Z INFO  [sap-connector] DebtCheck idClienteSap=400123 result=BLOCKED amount=12500.00 ARS",
   "monitors": {
     "gcp": {
       "pre_fix": { "healthy": true, "anomalies": [], "details": { "cloud_run_status": "OK" } },

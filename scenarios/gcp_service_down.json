@@ -3,6 +3,7 @@
   "label": "Error 503 en API",
   "query": "Recibo error 503 al usar la API de publicaciones",
   "publisher_id": "pub-demo-004",
+  "stacktrace": "2026-05-27T11:02:33Z ERROR [cloud-run] Health check failed for postings-api revision=postings-api-00042-abc\njava.lang.RuntimeException: Startup probe failed: connection refused :8080\n\tat com.navent.realestate.api.PostingsApplication.main(PostingsApplication.java:31)\n2026-05-27T11:02:34Z ERROR [load-balancer] HTTP 503 upstream=postings-api instances=0/3 healthy",
   "monitors": {
     "gcp": {
       "pre_fix": {

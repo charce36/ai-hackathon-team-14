@@ -17,7 +17,6 @@ cd ..
 
 echo "==> Starting server (VIDEO_DEMO=true)..."
 export VIDEO_DEMO=true
-export DRY_RUN=true
 export DEMO_STEP_DELAY_MS=800
 
 python -m publisher_support.main &

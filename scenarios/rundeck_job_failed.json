@@ -3,6 +3,7 @@
   "label": "Proceso batch no corrió",
   "query": "El proceso batch de actualización no corrió anoche",
   "publisher_id": "pub-demo-005",
+  "stacktrace": "2026-05-27T03:00:15Z ERROR [rundeck] Job publisher-batch-sync FAILED exitCode=1\njava.lang.NullPointerException: publisherId must not be null\n\tat com.navent.batch.PublisherBatchSync.processChunk(PublisherBatchSync.java:118)\n\tat com.navent.batch.PublisherBatchSync.run(PublisherBatchSync.java:45)\n2026-05-27T03:00:15Z INFO  [rundeck] Execution 88421 status=FAILED duration=4m12s",
   "monitors": {
     "gcp": {
       "pre_fix": { "healthy": true, "anomalies": [], "details": {} },

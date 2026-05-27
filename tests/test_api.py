@@ -1,22 +1,4 @@
 import pytest
-from httpx import ASGITransport, AsyncClient
-
-from publisher_support.config import settings
-from publisher_support.main import app
-
-
-@pytest.fixture(autouse=True)
-def fast_demo(monkeypatch):
-    monkeypatch.setattr(settings, "demo_step_delay_ms", 50)
-    monkeypatch.setattr(settings, "auto_approve_delay_sec", 0.1)
-    monkeypatch.setattr(settings, "video_demo", True)
-
-
-@pytest.fixture
-async def client():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as c:
-        yield c
 
 
 @pytest.mark.asyncio

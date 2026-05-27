@@ -37,10 +37,16 @@ class MonitorSnapshot(BaseModel):
     details: dict[str, Any] = Field(default_factory=dict)
 
 
+class PatchFile(BaseModel):
+    path: str
+    action: str
+    content: str = ""
+
+
 class PatchProposal(BaseModel):
     patch_id: str
     description: str
-    files: list[dict[str, str]] = Field(default_factory=list)
+    files: list[PatchFile] = Field(default_factory=list)
 
 
 class RootCauseReport(BaseModel):

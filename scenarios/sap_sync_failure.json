@@ -3,6 +3,7 @@
   "label": "Facturación SAP desactualizada",
   "query": "Mi facturación está desactualizada, no veo los últimos pagos reflejados",
   "publisher_id": "pub-demo-002",
+  "stacktrace": "2026-05-27T08:00:01Z ERROR [sap-sync-job] RFC_READ_TABLE timeout after 120s\ncom.sap.conn.jco.JCoException: Connection timed out host=sap-prd.navent.biz\n\tat com.navent.batch.SapSyncJob.execute(SapSyncJob.java:67)\n\tat org.quartz.core.JobRunShell.run(JobRunShell.java:202)\n2026-05-27T08:00:01Z WARN  [billing-api] last_successful_sync=2026-05-25T20:00:00Z threshold=24h",
   "monitors": {
     "gcp": {
       "pre_fix": { "healthy": true, "anomalies": [], "details": {} },
