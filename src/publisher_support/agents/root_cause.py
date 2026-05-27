@@ -45,9 +45,13 @@ def _build_rca_user_prompt(state: CaseState) -> str:
     )
 
 
+def _rca_system_prompt() -> str:
+    return _load_prompt("rca.md") + "\n\n---\n\n" + _load_prompt("publisher_tone.md")
+
+
 async def analyze_with_claude(state: CaseState) -> RCALLMOutput:
     return await invoke_structured(
-        system=_load_prompt("rca.md"),
+        system=_rca_system_prompt(),
         user=_build_rca_user_prompt(state),
         output_model=RCALLMOutput,
         tool_name="propose_root_cause_and_fix",
@@ -76,7 +80,7 @@ async def root_cause_node(state: CaseState) -> CaseState:
         root_cause=result.root_cause,
         confidence=result.confidence,
         eta_minutes=result.eta_minutes,
-        summary=result.summary,
+        summary=result.publisher_summary,
     )
     state.proposed_patch = PatchProposal(
         patch_id=result.patch_id,

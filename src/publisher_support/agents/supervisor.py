@@ -1,5 +1,8 @@
 from publisher_support.agents.helpers import emit_audit, emit_client_message
-from publisher_support.models.events import ClientMessage, ClientMessageType
+from publisher_support.agents.messaging import (
+    client_message_identified,
+    client_message_resolved,
+)
 from publisher_support.models.schemas import CaseState, CaseStatus
 
 
@@ -19,12 +22,9 @@ async def notify_identified_node(state: CaseState) -> CaseState:
         return state
     await emit_client_message(
         state,
-        ClientMessage(
-            type=ClientMessageType.IDENTIFIED,
-            text=(
-                f"Identificamos el problema: {state.root_cause.summary}. "
-                f"Lo resolveremos en aproximadamente {state.root_cause.eta_minutes} minutos."
-            ),
+        client_message_identified(
+            state.root_cause.summary,
+            state.root_cause.eta_minutes,
         ),
     )
     await emit_audit(state, "Notify", "Mensaje de progreso enviado al publisher")
@@ -32,14 +32,12 @@ async def notify_identified_node(state: CaseState) -> CaseState:
 
 
 async def notify_resolved_node(state: CaseState) -> CaseState:
-    summary = state.root_cause.summary if state.root_cause else "tu consulta"
-    await emit_client_message(
-        state,
-        ClientMessage(
-            type=ClientMessageType.RESOLVED,
-            text=f"Tu consulta quedó resuelta: {summary}. Ya podés operar con normalidad.",
-        ),
+    summary = (
+        state.root_cause.summary
+        if state.root_cause
+        else "Tu consulta fue atendida correctamente."
     )
+    await emit_client_message(state, client_message_resolved(summary))
     state.status = CaseStatus.RESOLVED
     await emit_audit(state, "Notify", "Caso cerrado — publisher notificado")
     return state

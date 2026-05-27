@@ -56,7 +56,10 @@ def _mock_rca_output(scenario_id: str) -> RCALLMOutput:
     )
     return RCALLMOutput(
         root_cause=f"Causa raíz mock para {scenario_id}",
-        summary=f"Problema identificado en {scenario_id}",
+        summary=f"Problema técnico identificado en {scenario_id}",
+        publisher_summary=(
+            "Encontramos un inconveniente con tu operación y ya estamos trabajando para solucionarlo."
+        ),
         confidence=0.91,
         eta_minutes=15,
         patch_id=patch_id,

@@ -12,5 +12,6 @@ def test_rca_output_fills_missing_files_and_reasoning():
     }
     result = RCALLMOutput.model_validate(partial)
     assert result.reasoning
+    assert result.publisher_summary
     assert len(result.files) >= 1
     assert result.files[0].content.strip()

@@ -3,11 +3,11 @@ from pathlib import Path
 
 from publisher_support.adapters.scenarios import list_scenarios
 from publisher_support.agents.helpers import emit_audit, emit_client_message
+from publisher_support.agents.messaging import client_message_checking
 from publisher_support.agents.llm_errors import handle_llm_error
 from publisher_support.config import ROOT_DIR
 from publisher_support.llm.client import invoke_structured
 from publisher_support.llm.schemas import ClassifierLLMOutput
-from publisher_support.models.events import ClientMessage, ClientMessageType
 from publisher_support.models.schemas import CaseState, CaseStatus, ClassifiedQuery
 
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
@@ -49,13 +49,7 @@ async def classify_with_claude(state: CaseState) -> ClassifierLLMOutput:
 async def classifier_node(state: CaseState) -> CaseState:
     state.status = CaseStatus.CLASSIFYING
 
-    await emit_client_message(
-        state,
-        ClientMessage(
-            type=ClientMessageType.CHECKING,
-            text="Estoy verificando tu consulta, aguardá un momento.",
-        ),
-    )
+    await emit_client_message(state, client_message_checking())
 
     try:
         result = await classify_with_claude(state)

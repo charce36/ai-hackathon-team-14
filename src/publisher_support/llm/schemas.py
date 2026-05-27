@@ -38,6 +38,7 @@ class PatchFileLLM(BaseModel):
 class RCALLMOutput(BaseModel):
     root_cause: str
     summary: str = ""
+    publisher_summary: str = ""
     confidence: float = Field(default=0.85, ge=0.0, le=1.0)
     eta_minutes: int = Field(default=15, ge=1, le=120)
     patch_id: str = "fix-pending"
@@ -55,6 +56,11 @@ class RCALLMOutput(BaseModel):
 
         if not data.get("summary"):
             data["summary"] = root[:250]
+
+        if not data.get("publisher_summary"):
+            data["publisher_summary"] = (
+                "Detectamos un inconveniente en tu cuenta y ya estamos trabajando para solucionarlo."
+            )
 
         if not data.get("reasoning"):
             data["reasoning"] = f"Correlación stacktrace + monitores: {root[:200]}"
